@@ -1,0 +1,14 @@
+{
+  "name": "stock-manager",
+  "version": "1.0.0",
+  "description": "Build a backend app to manage e-commerce inventory flow",
+  "main": "index.js",
+  "scripts": {
+    "test": "",
+    "dev": ""
+  },
+  "keywords": [],
+  "author": "Erick Welberth",
+  "license": "ISC",
+  "type": "commonjs"
+}
