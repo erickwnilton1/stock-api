@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "",
-    "dev": ""
+    "start": "nodemon src/server.ts"
   },
   "keywords": [],
   "author": "Erick Welberth",
