@@ -1,0 +1,4 @@
+# Block packages from uploading to the API cloud
+
+node_modules/
+.env
