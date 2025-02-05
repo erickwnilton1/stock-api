@@ -15,8 +15,10 @@
     "@prisma/client": "^6.3.1",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.1",
+    "@types/nodemon": "^1.19.6",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "nodemon": "^3.1.9",
     "prisma": "^6.3.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"
