@@ -11,7 +11,9 @@ export const getUsers = async () => {
   try {
     return await prisma.user.findMany();
   } catch (error) {
-    console.log(`Error fetching users: ${error}`);
+    console.log(`error fetching users: ${error}`);
+
+    throw new Error("failed to fetch users");
   }
 };
 
@@ -19,7 +21,9 @@ export const getUserById = async (id: string) => {
   try {
     return await prisma.user.findUnique({ where: { id } });
   } catch (error) {
-    console.log(`Error fetching user ${id}: ${error}`);
+    console.log(`error fetching user ${id}: ${error}`);
+
+    throw new Error("user not found");
   }
 };
 
@@ -35,7 +39,9 @@ export const createUser = async (
       data: { name, email, password: hashedPassword },
     });
   } catch (error) {
-    console.log(`Error creating user: ${error}`);
+    console.log(`error creating user: ${error}`);
+
+    throw new Error("failed to create user");
   }
 };
 
@@ -46,7 +52,9 @@ export const updateUser = async (id: string, data: Partial<User>) => {
     }
     return await prisma.user.update({ where: { id }, data });
   } catch (error) {
-    console.log(`Error updating user: ${id}: ${error}`);
+    console.log(`error updating user: ${id}: ${error}`);
+
+    throw new Error("failed to update user");
   }
 };
 
@@ -54,6 +62,8 @@ export const deleteUser = async (id: string) => {
   try {
     return await prisma.user.delete({ where: { id } });
   } catch (error) {
-    console.log(`Error deleting user: ${id}: ${error}`);
+    console.log(`error deleting user: ${id}: ${error}`);
+
+    throw new Error("failed to delete user");
   }
 };
