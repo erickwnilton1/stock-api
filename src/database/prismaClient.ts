@@ -1,4 +1,4 @@
 import { PrismaClient } from "@prisma/client";
 
-const prima = new PrismaClient();
-export default prima;
+const prisma = new PrismaClient();
+export default prisma;
