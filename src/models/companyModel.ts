@@ -1,4 +1,5 @@
 import prisma from "../database/prismaClient";
+import bcrypt from "bcrypt";
 
 export const getCompanys = async () => {
   try {
@@ -26,7 +27,11 @@ export const createCompany = async (
   password: string
 ) => {
   try {
-    return await prisma.company.create({ data: { name, email, password } });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    return await prisma.company.create({
+      data: { name, email, password: hashedPassword },
+    });
   } catch (error) {
     console.log(`error creating company: ${error}`);
 
