@@ -1,7 +1,7 @@
 import prisma from "../database/prismaClient";
 import bcrypt from "bcrypt";
 
-interface User {
+interface UserDTO {
   name: string;
   email: string;
   password: string;
@@ -47,7 +47,7 @@ export const createUser = async (
 
 export const updateUser = async (
   id: string,
-  data: Partial<User>,
+  data: Partial<UserDTO>,
   email: any
 ) => {
   try {
