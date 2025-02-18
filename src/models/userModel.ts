@@ -48,7 +48,7 @@ export const createUser = async (
 export const updateUser = async (
   id: string,
   data: Partial<UserDTO>,
-  email: any
+  email?: any
 ) => {
   try {
     if (data.password) {

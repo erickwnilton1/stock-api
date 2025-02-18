@@ -7,17 +7,25 @@ import {
   deleteUser,
 } from "../models/userModel";
 
+interface UserDTO {
+  name: string;
+  email: string;
+}
+
 export const getAllUsers = async (_: Request, res: Response) => {
   try {
     const users = await getUsers();
 
     if (!users || users.length === 0) {
-      return res.status(400).json({ message: "no users found" });
+      res.status(400).json({ message: "no users found" });
+      return;
     }
 
-    return res.status(200).json(users);
+    res.status(200).json(users);
+    return;
   } catch (error) {
-    return res.status(500).json({ message: "error when searching for users" });
+    res.status(500).json({ message: "error when searching for users" });
+    return;
   }
 };
 
@@ -34,19 +42,31 @@ export const addUser = async (req: Request, res: Response) => {
 
   const user = await createUser(name, email, password);
 
-  return res.status(201).json(user);
+  res.status(201).json(user);
+  return;
 };
 
 export const modifyUser = async (req: Request, res: Response) => {
-  const { name, email } = req.body;
+  try {
+    const { name, email } = req.body;
 
-  const user = await updateUser(req.params.id, name, email);
+    const updateData: Partial<UserDTO> = {};
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
 
-  return res.status(200).json(user);
+    const user = await updateUser(req.params.id, updateData);
+
+    res.status(200).json(user);
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user" });
+    return;
+  }
 };
 
 export const removeUser = async (req: Request, res: Response) => {
   const removeCreatedUser = await deleteUser(req.params.id);
 
-  return res.status(200).send().json(removeCreatedUser);
+  res.status(200).send().json(removeCreatedUser);
+  return;
 };
