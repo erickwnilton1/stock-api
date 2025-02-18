@@ -45,11 +45,7 @@ export const createUser = async (
   }
 };
 
-export const updateUser = async (
-  id: string,
-  data: Partial<UserDTO>,
-  email?: any
-) => {
+export const updateUser = async (id: string, data: Partial<UserDTO>) => {
   try {
     if (data.password) {
       data.password = await bcrypt.hash(data.password, 10);
