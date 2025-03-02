@@ -12,14 +12,15 @@ export const getAllCompanys = async (_: Request, res: Response) => {
     const companys = await getCompanys();
 
     if (!companys || companys.length === 0) {
-      return res.status(400).json({ message: "no companys found" });
+      res.status(400).json({ message: "no companys found" });
+      return;
     }
 
-    return res.status(200).json(companys);
+    res.status(200).json(companys);
+    return;
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "error when searching for companys" });
+    res.status(500).json({ message: "error when searching for companys" });
+    return;
   }
 };
 
@@ -36,7 +37,8 @@ export const addCompany = async (req: Request, res: Response) => {
 
   const company = await createCompany(name, email, password);
 
-  return res.status(201).json(company.name);
+  res.status(201).json(company.name);
+  return;
 };
 
 export const modifyCompany = async (req: Request, res: Response) => {
@@ -44,11 +46,13 @@ export const modifyCompany = async (req: Request, res: Response) => {
 
   const company = await updateCompany(req.params.id, name, email);
 
-  return res.status(200).json(company);
+  res.status(200).json(company);
+  return;
 };
 
 export const removeCompany = async (req: Request, res: Response) => {
   const removeCreatedCompany = await deleteCompany(req.params.id);
 
-  return res.status(200).send().json(removeCreatedCompany.name);
+  res.status(200).send().json(removeCreatedCompany.name);
+  return;
 };
