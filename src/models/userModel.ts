@@ -9,7 +9,7 @@ interface UserDTO {
 
 export const getUsers = async () => {
   try {
-    return await prisma.user.findMany();
+    return await prisma.user.findMany({ include: { products: true } });
   } catch (error) {
     console.log(`error fetching users: ${error}`);
 
@@ -19,7 +19,12 @@ export const getUsers = async () => {
 
 export const getUserById = async (id: string) => {
   try {
-    return await prisma.user.findUnique({ where: { id } });
+    return await prisma.user.findUnique({
+      where: { id },
+      include: {
+        products: true,
+      },
+    });
   } catch (error) {
     console.log(`error fetching user ${id}: ${error}`);
 

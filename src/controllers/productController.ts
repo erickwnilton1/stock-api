@@ -12,12 +12,15 @@ export const getAllProducts = async (_: Request, res: Response) => {
     const products = await getProducts();
 
     if (!products || products.length === 0) {
-      return res.status(400).json({ message: "no products found" });
+      res.status(400).json({ message: "no products found" });
+      return;
     }
 
-    return res.status(200).json(products);
+    res.status(200).json(products);
+    return;
   } catch (error) {
     res.status(500).json({ message: "error when searching for companys" });
+    return;
   }
 };
 
@@ -30,29 +33,66 @@ export const getSingleProduct = async (req: Request, res: Response) => {
 };
 
 export const addProduct = async (req: Request, res: Response) => {
-  const { name, description, price, quantity } = req.body;
+  try {
+    const { name, description, price, quantity, userId, companyId } = req.body;
 
-  const product = await createProduct(name, description, price, quantity);
+    if (!name || !price || !quantity) {
+      res.status(400).json({
+        message:
+          "the items name, price and quantity are required to add a product",
+      });
 
-  return res.status(201).json(product);
+      return;
+    }
+
+    const product = await createProduct({
+      name,
+      description,
+      price,
+      quantity,
+      userId,
+      companyId,
+    });
+
+    res.status(201).json(product);
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create product" });
+    return;
+  }
 };
 
 export const modifyProduct = async (req: Request, res: Response) => {
-  const { name, description, price, quantity } = req.body;
+  try {
+    const { name, description, price, quantity } = req.body;
 
-  const product = await updateProduct(
-    req.params.id,
-    name,
-    description,
-    price,
-    quantity
-  );
+    if (!name || !price || !quantity) {
+      res.status(400).json({
+        message:
+          "the items name, price and quantity are required to update a product",
+      });
 
-  return res.status(200).json(product);
+      return;
+    }
+
+    const product = await updateProduct(req.params.id, {
+      name,
+      description,
+      price,
+      quantity,
+    });
+
+    res.status(200).json(product);
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Failed to updated product" });
+    return;
+  }
 };
 
 export const removeProduct = async (req: Request, res: Response) => {
   const removeCreatedProduct = await deleteProduct(req.params.id);
 
-  return res.status(200).json(removeCreatedProduct.name);
+  res.status(200).json(removeCreatedProduct.name);
+  return;
 };
