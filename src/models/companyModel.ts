@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 export const getCompanys = async () => {
   try {
-    return await prisma.company.findMany();
+    return await prisma.company.findMany({ include: { products: true } });
   } catch (error) {
     console.log(`error fetching companys: ${error}`);
 
@@ -13,7 +13,10 @@ export const getCompanys = async () => {
 
 export const getCompanyById = async (id: string) => {
   try {
-    return await prisma.company.findUnique({ where: { id } });
+    return await prisma.company.findUnique({
+      where: { id },
+      include: { products: true },
+    });
   } catch (error) {
     console.log(`error fetching company ${id}: ${error}`);
 
