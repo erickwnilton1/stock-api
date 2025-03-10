@@ -38,12 +38,25 @@ export const getSingleUser = async (req: Request, res: Response) => {
 };
 
 export const addUser = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  const user = await createUser(name, email, password);
+    if (!name || !email || !password) {
+      res.status(400).json({
+        message: "the items name, email and password are required to add user",
+      });
 
-  res.status(201).json(user);
-  return;
+      return;
+    }
+
+    const user = await createUser(name, email, password);
+
+    res.status(201).json(user);
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create product" });
+    return;
+  }
 };
 
 export const modifyUser = async (req: Request, res: Response) => {
@@ -53,6 +66,14 @@ export const modifyUser = async (req: Request, res: Response) => {
     const updateData: Partial<UserDTO> = {};
     if (name) updateData.name = name;
     if (email) updateData.email = email;
+
+    if (!name || !email) {
+      res.status(400).json({
+        message: "the items name and email are required to update user",
+      });
+
+      return;
+    }
 
     const user = await updateUser(req.params.id, updateData);
 
