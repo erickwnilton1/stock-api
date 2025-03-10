@@ -33,16 +33,38 @@ export const getSingleCompany = async (req: Request, res: Response) => {
 };
 
 export const addCompany = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  const company = await createCompany(name, email, password);
+    if (!name || !email || !password) {
+      res.status(400).json({
+        message:
+          "the items name, email and password are required to add company",
+      });
 
-  res.status(201).json(company.name);
-  return;
+      return;
+    }
+
+    const company = await createCompany(name, email, password);
+
+    res.status(201).json(company.name);
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create product" });
+    return;
+  }
 };
 
 export const modifyCompany = async (req: Request, res: Response) => {
   const { name, email } = req.body;
+
+  if (!name || !email) {
+    res.status(400).json({
+      message: "the items name and email are required to add company",
+    });
+
+    return;
+  }
 
   const company = await updateCompany(req.params.id, name, email);
 
