@@ -1,51 +1,40 @@
 import { Request, Response } from "express";
-import {
-  createProduct,
-  deleteProduct,
-  getProducts,
-  getProductsById,
-  updateProduct,
-} from "../models/productModel";
+import { productService } from "../services/productService";
 
 export const getAllProducts = async (_: Request, res: Response) => {
   try {
-    const products = await getProducts();
-
-    if (!products || products.length === 0) {
-      res.status(400).json({ message: "no products found" });
-      return;
-    }
+    const products = await productService.listProducts();
 
     res.status(200).json(products);
     return;
   } catch (error) {
-    res.status(500).json({ message: "error when searching for companys" });
+    res.status(500).json({ message: "error when searching for products" });
     return;
   }
 };
 
 export const getSingleProduct = async (req: Request, res: Response) => {
-  const singleProduct = await getProductsById(req.params.id);
+  try {
+    const product = await productService.findProductById(req.params.id);
 
-  singleProduct
-    ? res.json(singleProduct)
-    : res.status(400).json({ message: "product not found" });
+    if (!product) {
+      res.status(404).json({ message: "product not found" });
+      return;
+    }
+
+    res.status(200).json(product);
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving product" });
+    return;
+  }
 };
 
 export const addProduct = async (req: Request, res: Response) => {
   try {
     const { name, description, price, quantity, userId, companyId } = req.body;
 
-    if (!name || !price || !quantity) {
-      res.status(400).json({
-        message:
-          "the items name, price and quantity are required to add a product",
-      });
-
-      return;
-    }
-
-    const product = await createProduct({
+    const product = await productService.createProduct({
       name,
       description,
       price,
@@ -75,7 +64,7 @@ export const modifyProduct = async (req: Request, res: Response) => {
       return;
     }
 
-    const product = await updateProduct(req.params.id, {
+    const product = await productService.updateProduct(req.params.id, {
       name,
       description,
       price,
@@ -91,8 +80,17 @@ export const modifyProduct = async (req: Request, res: Response) => {
 };
 
 export const removeProduct = async (req: Request, res: Response) => {
-  const removeCreatedProduct = await deleteProduct(req.params.id);
+  try {
+    const removeCreatedProduct = await productService.deleteProduct(
+      req.params.id
+    );
 
-  res.status(200).json(removeCreatedProduct.name);
-  return;
+    res
+      .status(200)
+      .json({ message: `product ${removeCreatedProduct} Removed` });
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete product" });
+    return;
+  }
 };

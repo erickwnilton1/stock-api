@@ -1,81 +1,29 @@
 import prisma from "../database/prismaClient";
+import { CreateProductDTO } from "../dtos/createProductDTO";
 
-interface ProductDTO {
-  name: string;
-  description: string;
-  price: number;
-  quantity: number;
-  userId?: string;
-  companyId?: string;
-}
+export const productModel = {
+  async getAll() {
+    prisma.product.findMany();
+    return;
+  },
 
-export const getProducts = async () => {
-  try {
-    return await prisma.product.findMany();
-  } catch (error) {
-    console.log(`error fetching products: ${error}`);
-
-    throw new Error("failed to fetch products");
-  }
-};
-
-export const getProductsById = async (id: string) => {
-  try {
+  async getById(id: string) {
     const product = await prisma.product.findUnique({ where: { id } });
+    return product || null;
+  },
 
-    if (!product) {
-      console.log(`product with ID ${id} not found`);
-    }
+  async create(data: CreateProductDTO) {
+    const product = await prisma.product.create({ data });
+    return product || null;
+  },
 
-    return product;
-  } catch (error) {
-    console.log(`error fetching product ${id}: ${error}`);
+  async update(id: string, data: Partial<CreateProductDTO>) {
+    prisma.product.update({ where: { id }, data });
+    return;
+  },
 
-    throw new Error("product not found");
-  }
-};
-
-export const createProduct = async (data: ProductDTO) => {
-  try {
-    return await prisma.product.create({ data });
-  } catch (error) {
-    console.log(`error creating product: ${error}`);
-
-    throw new Error("failed to create product");
-  }
-};
-
-export const updateProduct = async (id: string, data: Partial<ProductDTO>) => {
-  try {
-    const product = await prisma.product.findUnique({ where: { id } });
-
-    if (!product) {
-      console.log(`product with ID ${id} not found`);
-    }
-
-    return await prisma.product.update({
-      where: { id },
-      data,
-    });
-  } catch (error) {
-    console.error(`Error updating product ${id}: ${error}`);
-
-    throw new Error("Failed to update product");
-  }
-};
-
-export const deleteProduct = async (id: string) => {
-  try {
-    const product = await prisma.product.findUnique({ where: { id } });
-
-    if (!product) {
-      console.log(`product with ID ${id} not found`);
-    }
-
-    return await prisma.product.delete({ where: { id } });
-  } catch (error) {
-    console.log(`error deleting product: ${id}: ${error}`);
-
-    throw new Error("failed to delete product");
-  }
+  async delete(id: string) {
+    prisma.product.delete({ where: { id } });
+    return;
+  },
 };
