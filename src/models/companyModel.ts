@@ -1,70 +1,43 @@
-import prisma from "../database/prismaClient";
 import bcrypt from "bcrypt";
+import prisma from "../database/prismaClient";
+import { CreateCompanyDTO } from "../dtos/createCompanyDTO";
 
-export const getCompanys = async () => {
-  try {
-    return await prisma.company.findMany({ include: { products: true } });
-  } catch (error) {
-    console.log(`error fetching companys: ${error}`);
+export const companyModel = {
+  async getAll() {
+    const companys = await prisma.company.findMany();
+    return companys;
+  },
 
-    throw new Error("failed to fetch companys");
-  }
-};
+  async getById(id: string) {
+    const company = await prisma.company.findUnique({ where: { id } });
+    return company || null;
+  },
 
-export const getCompanyById = async (id: string) => {
-  try {
-    return await prisma.company.findUnique({
-      where: { id },
-      include: { products: true },
-    });
-  } catch (error) {
-    console.log(`error fetching company ${id}: ${error}`);
+  async create(data: CreateCompanyDTO) {
+    try {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    throw new Error("company not found");
-  }
-};
+      const company = await prisma.company.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: hashedPassword,
+        },
+      });
 
-export const createCompany = async (
-  name: string,
-  email: string,
-  password: string
-) => {
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+      return company || null;
+    } catch (error) {
+      throw new Error("failed to create company");
+    }
+  },
 
-    return await prisma.company.create({
-      data: { name, email, password: hashedPassword },
-    });
-  } catch (error) {
-    console.log(`error creating company: ${error}`);
+  async update(id: string, data: Partial<CreateCompanyDTO>) {
+    await prisma.company.update({ where: { id }, data });
+    return;
+  },
 
-    throw new Error("failed to create company");
-  }
-};
-
-export const updateCompany = async (
-  id: string,
-  name: string,
-  email: string
-) => {
-  try {
-    return await prisma.company.update({
-      where: { id },
-      data: { name, email },
-    });
-  } catch (error) {
-    console.log(`error updating company: ${id}: ${error}`);
-
-    throw new Error("failed to update company");
-  }
-};
-
-export const deleteCompany = async (id: string) => {
-  try {
-    return await prisma.company.delete({ where: { id } });
-  } catch (error) {
-    console.log(`error deleting company: ${id}: ${error}`);
-
-    throw new Error("failed to delete company");
-  }
+  async delete(id: string) {
+    await prisma.company.delete({ where: { id } });
+    return;
+  },
 };

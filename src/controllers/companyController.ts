@@ -1,20 +1,9 @@
 import { Request, Response } from "express";
-import {
-  getCompanys,
-  getCompanyById,
-  createCompany,
-  updateCompany,
-  deleteCompany,
-} from "../models/companyModel";
+import { companyService } from "../services/companyService";
 
 export const getAllCompanys = async (_: Request, res: Response) => {
   try {
-    const companys = await getCompanys();
-
-    if (!companys || companys.length === 0) {
-      res.status(400).json({ message: "no companys found" });
-      return;
-    }
+    const companys = await companyService.listCompanys();
 
     res.status(200).json(companys);
     return;
@@ -25,32 +14,31 @@ export const getAllCompanys = async (_: Request, res: Response) => {
 };
 
 export const getSingleCompany = async (req: Request, res: Response) => {
-  const singleCompany = await getCompanyById(req.params.id);
+  try {
+    const singleCompany = await companyService.findCompanyById(req.params.id);
 
-  singleCompany
-    ? res.json(singleCompany)
-    : res.status(404).json({ error: "company not found" });
+    res.status(200).json(singleCompany);
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "error recovering company" });
+    return;
+  }
 };
 
 export const addCompany = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      res.status(400).json({
-        message:
-          "the items name, email and password are required to add company",
-      });
-
-      return;
-    }
-
-    const company = await createCompany(name, email, password);
+    const company = await companyService.createCompany({
+      name,
+      email,
+      password,
+    });
 
     res.status(201).json(company.name);
     return;
   } catch (error) {
-    res.status(500).json({ error: "Failed to create product" });
+    res.status(500).json({ error: "Failed to create company" });
     return;
   }
 };
@@ -58,23 +46,25 @@ export const addCompany = async (req: Request, res: Response) => {
 export const modifyCompany = async (req: Request, res: Response) => {
   const { name, email } = req.body;
 
-  if (!name || !email) {
-    res.status(400).json({
-      message: "the items name and email are required to add company",
-    });
-
-    return;
-  }
-
-  const company = await updateCompany(req.params.id, name, email);
+  const company = await companyService.updateCompany(req.params.id, {
+    name,
+    email,
+  });
 
   res.status(200).json(company);
   return;
 };
 
 export const removeCompany = async (req: Request, res: Response) => {
-  const removeCreatedCompany = await deleteCompany(req.params.id);
+  try {
+    const removeCreatedCompany = await companyService.deleteCompany(
+      req.params.id
+    );
 
-  res.status(200).send().json(removeCreatedCompany.name);
-  return;
+    res.status(200).json({ message: "company removed" });
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete company" });
+    return;
+  }
 };
