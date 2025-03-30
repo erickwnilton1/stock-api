@@ -3,8 +3,7 @@ import { productModel } from "../models/productModel";
 
 export const productService = {
   async listProducts() {
-    productModel.getAll();
-    return;
+    return await productModel.getAll();
   },
 
   async findProductById(id: string) {
@@ -34,6 +33,12 @@ export const productService = {
   async updateProduct(id: string, data: CreateProductDTO) {
     if (!id) {
       throw new Error("Invalid ID");
+    }
+
+    if (!data.name || !data.price || !data.price) {
+      throw new Error(
+        "the items name, price and quantity are required to update a product"
+      );
     }
 
     const product = await productModel.update(id, data);

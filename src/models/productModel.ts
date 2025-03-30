@@ -3,8 +3,8 @@ import { CreateProductDTO } from "../dtos/createProductDTO";
 
 export const productModel = {
   async getAll() {
-    prisma.product.findMany();
-    return;
+    const products = await prisma.product.findMany();
+    return products;
   },
 
   async getById(id: string) {
@@ -18,12 +18,10 @@ export const productModel = {
   },
 
   async update(id: string, data: Partial<CreateProductDTO>) {
-    prisma.product.update({ where: { id }, data });
-    return;
+    return await prisma.product.update({ where: { id }, data });
   },
 
   async delete(id: string) {
-    prisma.product.delete({ where: { id } });
-    return;
+    return await prisma.product.delete({ where: { id } });
   },
 };

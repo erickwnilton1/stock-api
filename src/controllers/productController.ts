@@ -17,11 +17,6 @@ export const getSingleProduct = async (req: Request, res: Response) => {
   try {
     const product = await productService.findProductById(req.params.id);
 
-    if (!product) {
-      res.status(404).json({ message: "product not found" });
-      return;
-    }
-
     res.status(200).json(product);
     return;
   } catch (error) {
@@ -55,15 +50,6 @@ export const modifyProduct = async (req: Request, res: Response) => {
   try {
     const { name, description, price, quantity } = req.body;
 
-    if (!name || !price || !quantity) {
-      res.status(400).json({
-        message:
-          "the items name, price and quantity are required to update a product",
-      });
-
-      return;
-    }
-
     const product = await productService.updateProduct(req.params.id, {
       name,
       description,
@@ -81,13 +67,9 @@ export const modifyProduct = async (req: Request, res: Response) => {
 
 export const removeProduct = async (req: Request, res: Response) => {
   try {
-    const removeCreatedProduct = await productService.deleteProduct(
-      req.params.id
-    );
+    const product = await productService.deleteProduct(req.params.id);
 
-    res
-      .status(200)
-      .json({ message: `product ${removeCreatedProduct} Removed` });
+    res.status(200).json(product);
     return;
   } catch (error) {
     res.status(500).json({ message: "Failed to delete product" });
