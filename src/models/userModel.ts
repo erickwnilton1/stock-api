@@ -1,74 +1,43 @@
-import prisma from "../database/prismaClient";
 import bcrypt from "bcrypt";
+import prisma from "../database/prismaClient";
+import { CreateUserDTO } from "../dtos/createUserDTO";
 
-interface UserDTO {
-  name: string;
-  email: string;
-  password: string;
-}
+export const userModel = {
+  async getAll() {
+    const users = await prisma.user.findMany({ include: { products: true } });
+    return users;
+  },
 
-export const getUsers = async () => {
-  try {
-    return await prisma.user.findMany({ include: { products: true } });
-  } catch (error) {
-    console.log(`error fetching users: ${error}`);
+  async getById(id: string) {
+    const user = await prisma.user.findUnique({ where: { id } });
+    return user || null;
+  },
 
-    throw new Error("failed to fetch users");
-  }
-};
+  async create(data: CreateUserDTO) {
+    try {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
 
-export const getUserById = async (id: string) => {
-  try {
-    return await prisma.user.findUnique({
-      where: { id },
-      include: {
-        products: true,
-      },
-    });
-  } catch (error) {
-    console.log(`error fetching user ${id}: ${error}`);
+      const user = await prisma.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: hashedPassword,
+        },
+      });
 
-    throw new Error("user not found");
-  }
-};
-
-export const createUser = async (
-  name: string,
-  email: string,
-  password: string
-) => {
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    return await prisma.user.create({
-      data: { name, email, password: hashedPassword },
-    });
-  } catch (error) {
-    console.log(`error creating user: ${error}`);
-
-    throw new Error("failed to create user");
-  }
-};
-
-export const updateUser = async (id: string, data: Partial<UserDTO>) => {
-  try {
-    if (data.password) {
-      data.password = await bcrypt.hash(data.password, 10);
+      return user || null;
+    } catch (error) {
+      throw new Error("failed to create user");
     }
-    return await prisma.user.update({ where: { id }, data });
-  } catch (error) {
-    console.log(`error updating user: ${id}: ${error}`);
+  },
 
-    throw new Error("failed to update user");
-  }
-};
+  async update(id: string, data: Partial<CreateUserDTO>) {
+    await prisma.user.update({ where: { id }, data });
+    return;
+  },
 
-export const deleteUser = async (id: string) => {
-  try {
-    return await prisma.user.delete({ where: { id } });
-  } catch (error) {
-    console.log(`error deleting user: ${id}: ${error}`);
-
-    throw new Error("failed to delete user");
-  }
+  async delete(id: string) {
+    await prisma.user.delete({ where: { id } });
+    return;
+  },
 };
